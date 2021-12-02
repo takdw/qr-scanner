@@ -79,6 +79,11 @@ export default {
       this.$nextTick(() => {
         this.scannerObj = new QrScanner(this.$refs.scanner, (result) => {
           this.scanResult = result;
+            // optional
+            axios
+              .post("/scan-result", { result })
+              .then((response) => console.log(response.data))
+              .catch((err) => console.log("error sending scan result"));
 
           this.endScanning();
         });
