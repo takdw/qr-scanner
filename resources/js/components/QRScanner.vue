@@ -43,6 +43,14 @@
           <div>
             <p class="font-bold">Scan result</p>
             <p class="text-xl mt-2">{{ scanResult }}</p>
+
+            <button
+              @click="reset"
+              type="button"
+              class="mt-6 px-4 py-1 text-sm border rounded bg-white hover:bg-gray-100"
+            >
+              Reset
+            </button>
           </div>
         </div>
       </div>
@@ -77,16 +85,19 @@ export default {
       this.scanning = true;
 
       this.$nextTick(() => {
-        this.scannerObj = new QrScanner(this.$refs.scanner, (result) => {
-          this.scanResult = result;
+        this.scannerObj =
+          this.scannerObj ||
+          new QrScanner(this.$refs.scanner, (result) => {
+            this.scanResult = result;
+
             // optional
             axios
               .post("/scan-result", { result })
               .then((response) => console.log(response.data))
               .catch((err) => console.log("error sending scan result"));
 
-          this.endScanning();
-        });
+            this.endScanning();
+          });
 
         this.scannerObj.start();
       });
@@ -97,7 +108,14 @@ export default {
 
       if (this.scannerObj) {
         this.scannerObj.stop();
+        this.scannerObj.destroy();
+        this.scannerObj = null;
       }
+    },
+
+    reset() {
+      this.scanning = false;
+      this.scanResult = "";
     },
   },
 };
